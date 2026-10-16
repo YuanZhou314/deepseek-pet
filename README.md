@@ -44,6 +44,11 @@ Harness 把会话数据拆到了多个客户端面上，插件按新的分工读
 服务不可用时会自动降级（例如没有 `uiConversation` 时只显示状态、不显示正文），不会抛错。
 升级 Harness 后请重新安装本插件，确保拉到的是匹配当前客户端 API 的版本。
 
+包清单按当前 DSH 插件规范声明：`engines.dsh` 为 `>=0.1.7-0`，低于该版本的 Harness 会在安装时
+直接给出不兼容提示；`react` / `react-dom` 由网页端共享模块表提供，不再作为 peer 依赖；
+插件管理器中的标题、简介来自 `locale/en.json`，图标为 `icon.webp`（由 `scripts/build_assets.py` 从立绘裁剪生成）。Web 与桌面版
+（`--profile desktop`）使用同一套插件加载方式，安装命令只需替换 profile 名。
+
 ## 安装
 
 安装需要 Node.js 和 `pnpm`。如果已经全局安装 `dsh`，运行：
@@ -108,16 +113,24 @@ npx @deepseek-ai/dsh plugin --profile web add github:keleus/deepseek-pet
 
 随后重新启动网页进程并刷新页面。
 
+> 从 0.2.1 起，插件的包名由 `deepseek-pet` 改为 `@keleus/deepseek-pet`
+> （npm 上的 `deepseek-pet` 属于另一个无关项目，同名会导致插件市场装错包而安装失败）。
+> 如果之前装过旧版本，请先移除旧包名再重新安装，避免同时加载两份：
+>
+> ```bash
+> dsh plugin --profile web remove deepseek-pet
+> ```
+
 ## 卸载
 
 ```bash
-dsh plugin --profile web remove deepseek-pet
+dsh plugin --profile web remove @keleus/deepseek-pet
 ```
 
 没有全局 CLI 时：
 
 ```bash
-npx @deepseek-ai/dsh plugin --profile web remove deepseek-pet
+npx @deepseek-ai/dsh plugin --profile web remove @keleus/deepseek-pet
 ```
 
 ## 使用

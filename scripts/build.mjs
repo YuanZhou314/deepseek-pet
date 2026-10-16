@@ -17,7 +17,7 @@ await build({
   minify: true,
   external: ['react', 'react/jsx-runtime', 'react-dom'],
   banner: {
-    js: 'window.__ModuleLoader__.load({ id: "deepseek-pet", factory: (require) => { var module = { exports: {} }; var exports = module.exports;',
+    js: 'window.__ModuleLoader__.load({ id: "@keleus/deepseek-pet", factory: (require) => { var module = { exports: {} }; var exports = module.exports;',
   },
   footer: { js: 'return module.exports; } });' },
 })

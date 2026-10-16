@@ -205,9 +205,20 @@ def build_reactions() -> None:
         save_square(image, OUTPUT / f"frame-{name}.webp", size=420, trim=True)
 
 
+def build_icon() -> None:
+    """Plugin Manager icon: the idle portrait's head and ears, square-cropped."""
+    portrait = Image.open(PUBLIC / "deepseek-idle.png").convert("RGBA")
+    head = portrait.crop((22, 16, 662, 656))
+    head = head.resize((256, 256), Image.Resampling.LANCZOS)
+    target = ROOT / "icon.webp"
+    head.save(target, "WEBP", quality=86, method=6)
+    print(f"wrote {target}")
+
+
 def main() -> None:
     OUTPUT.mkdir(parents=True, exist_ok=True)
     build_reactions()
+    build_icon()
 
 
 if __name__ == "__main__":

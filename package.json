@@ -1,16 +1,19 @@
 {
-  "name": "deepseek-pet",
-  "version": "0.2.0",
+  "name": "@keleus/deepseek-pet",
+  "version": "0.2.1",
   "private": false,
   "description": "DeepSeek Pet plugin: an interactive, state-aware companion embedded in DeepSeek Harness Web",
   "type": "module",
+  "icon": "./icon.webp",
   "main": "lib/index.js",
   "exports": {
     ".": "./lib/index.js",
     "./client": "./lib/client.js",
+    "./locale/*.json": "./locale/*.json",
     "./package.json": "./package.json"
   },
   "dsh": {
+    "manifestVersion": 1,
     "bundle": {
       "patch": "./cordis.patch.yml"
     },
@@ -31,6 +34,7 @@
     "test:visual:build": "esbuild tests/visual/fixture.jsx --bundle --outfile=tests/visual/fixture.bundle.js --format=iife --platform=browser --jsx=automatic"
   },
   "keywords": [
+    "dsh-plugin",
     "deepseek",
     "deepseek-harness",
     "cordis",
@@ -57,9 +61,7 @@
     "@deepseek-ai/dsh-client-ui-layout": "*",
     "@deepseek-ai/dsh-client-ui-session": "*",
     "@deepseek-ai/dsh-client-ui-slots": "*",
-    "@deepseek-ai/dsh-client-ui-workspace": "*",
-    "react": "^18.2.0",
-    "react-dom": "^18.2.0"
+    "@deepseek-ai/dsh-client-ui-workspace": "*"
   },
   "peerDependenciesMeta": {
     "@deepseek-ai/cordis": { "optional": true },
@@ -78,9 +80,12 @@
     "lib/index.js",
     "lib/client.js",
     "cordis.patch.yml",
+    "locale/*.json",
+    "icon.webp",
     "docs/deepseek-pet-preview.png"
   ],
   "engines": {
-    "node": ">=22.19"
+    "node": ">=22.19",
+    "dsh": ">=0.1.7-0"
   }
 }
