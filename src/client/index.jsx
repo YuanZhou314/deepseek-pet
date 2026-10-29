@@ -2,6 +2,7 @@ import { DeepSeekPetEntry } from './DeepSeekPet.jsx'
 import { DeepSeekPetSettings } from './DeepSeekPetSettings.jsx'
 import { installStyles } from './styles.js'
 import { createSessionBridge } from './pet-session.js'
+import { createAccountBalanceSource } from './pet-usage.js'
 
 export const inject = ['slots', 'sessions']
 
@@ -9,6 +10,7 @@ export const inject = ['slots', 'sessions']
 export function apply(ctx) {
   ctx.effect(installStyles, 'ui-live2d: styles')
   const bridge = createSessionBridge(ctx)
+  const balance = createAccountBalanceSource(ctx)
 
   ctx.slots.inject('shell.overlay', () => ctx.slots.register({
     name: 'shell.overlay',
@@ -19,6 +21,7 @@ export function apply(ctx) {
       resolveSession: sessionId => bridge.view(sessionId),
       openSession: sessionId => bridge.open(sessionId),
       statusSource: bridge.statuses,
+      balanceSource: balance,
     }),
   }, DeepSeekPetEntry))
 

@@ -14,6 +14,8 @@ import {
   stateFromSnapshot, streamFromSnapshot,
 } from './pet-state.js'
 import { currentSessionId, sessionLabel, sessionStatusOf } from './pet-session.js'
+import { EMPTY_BALANCE_SOURCE } from './pet-usage.js'
+import { PetUsageCard } from './PetUsageCard.jsx'
 
 const EMPTY_SNAPSHOT = Object.freeze({
   openState: 'open', running: false, runningCalls: [], partial: null,
@@ -88,13 +90,14 @@ export function DeepSeekPetEntry(props) {
   return <DeepSeekPet {...props} displayMode={displayMode} />
 }
 
-export function DeepSeekPet({ useSessions, resolveSession, openSession, statusSource = EMPTY_STATUS_SOURCE, displayMode }) {
+export function DeepSeekPet({ useSessions, resolveSession, openSession, statusSource = EMPTY_STATUS_SOURCE, balanceSource = EMPTY_BALANCE_SOURCE, displayMode }) {
   const storedMode = useDisplayMode()
   const mode = displayMode ?? storedMode
   const list = useSessions(value => value)
   // Running / pending-interaction facts live in the uiSession status map now;
   // the catalog rows only carry the running bit.
   const statuses = useSyncExternalStore(statusSource.subscribe, statusSource.getSnapshot, statusSource.getSnapshot)
+  const balance = useSyncExternalStore(balanceSource.subscribe, balanceSource.getSnapshot, balanceSource.getSnapshot)
   const sessionId = currentSessionId(list)
   const focusedSession = sessionId ? list.byId?.[sessionId] : undefined
   const focusedStatus = sessionStatusOf(statuses, focusedSession)
@@ -123,8 +126,11 @@ export function DeepSeekPet({ useSessions, resolveSession, openSession, statusSo
   )
   const immediate = stateFromSnapshot(session ? snapshot : null)
   const taskActive = Boolean(snapshot.running || snapshot.runningCalls?.length || snapshot.partial || snapshot.pending?.length || snapshot.queue?.length)
-  const contextRatio = Number.isFinite(pressure?.projectedTokens) && Number.isFinite(pressure?.contextWindow)
-    ? pressure.projectedTokens / pressure.contextWindow : 0
+  const contextTokens = Number.isFinite(pressure?.projectedTokens)
+    ? pressure.projectedTokens
+    : Number.isFinite(pressure?.pressureTokens) ? pressure.pressureTokens : null
+  const contextWindow = Number.isFinite(pressure?.contextWindow) && pressure.contextWindow > 0 ? pressure.contextWindow : null
+  const contextRatio = contextTokens !== null && contextWindow !== null ? contextTokens / contextWindow : 0
   const hasImage = hasRecentImage(snapshot)
   const userCorrection = hasRecentCorrection(snapshot)
   const questionCount = reasoningQuestionCount(snapshot)
@@ -480,9 +486,12 @@ export function DeepSeekPet({ useSessions, resolveSession, openSession, statusSo
         <button type="button" title="最小化 Pet" aria-label="最小化 Pet" onClick={() => setCollapsed(true)}><b>−</b><span>最小化</span></button>
       </nav>
       <section className="dsh-live2d-sessions" data-visible={focusedSession || runningSessions.length ? 'true' : 'false'} aria-label="活跃会话">
-        {focusedSession && <button className="dsh-live2d-session-focus" type="button" data-current="true" onClick={() => openSession?.(focusedSession.id)}>
-          <i data-running={focusedStatus.running ? 'true' : 'false'} /><span>{sessionLabel(focusedSession)}</span><small>聚焦</small>
-        </button>}
+        {(focusedSession || runningSessions.length > 0) && <PetUsageCard
+          contextTokens={contextTokens}
+          contextWindow={contextWindow}
+          balance={balance}
+          sessionLabel={focusedSession ? sessionLabel(focusedSession) : ''}
+        />}
         <div className="dsh-live2d-session-list" data-visible={runningSessions.length ? 'true' : 'false'}>
           {runningSessions.slice(0, 7).map((item, index) => <button key={item.id} type="button" data-stacked={index >= 3 ? 'true' : 'false'} onClick={() => openSession?.(item.id)}>
             <i data-running={item.running ? 'true' : 'false'} /><span>{item.label}</span><small>{item.pendingInteraction ? '等待操作' : '执行中'}</small>

@@ -1,6 +1,6 @@
 {
   "name": "@keleus/deepseek-pet",
-  "version": "0.2.1",
+  "version": "0.2.3",
   "private": false,
   "description": "DeepSeek Pet plugin: an interactive, state-aware companion embedded in DeepSeek Harness Web",
   "type": "module",
